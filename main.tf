@@ -1,39 +1,33 @@
 terraform {
   required_providers {
-    azurerm = {
-      source = "hashicorp/azurerm"
-      version = "3.45.0"
-    }
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "4.56.0"
     }
   }
 }
 
-provider "azurerm" {
-  # Configuration options
-features {}
-}
 provider "aws" {
   # Configuration options
+  region = "us-east-1"
 }
 
-resource "azurerm_resource_group" "r1" {
-  name     = "r1"
-  location = "Central Canada"
+resource "aws_s3_bucket" "bucket-dib-" {
+  #creating 3 buckets by incrementing name using count index
+  bucket = "${var.bucket-name}-00${count.index}"
+  count  = var.number-of-buckets
 }
 
-resource "aws_s3_bucket" "b1" {
-  bucket = "my-tf-test-bucket"
+#create 4 users using for_each for naming and toset function to remove duplicates in variable list of names
+resource "aws_iam_user" "team-DEV-02" {
+  for_each = toset(var.user-names)
+  name     = each.value
+}
 
-  tags = {
-    Name        = "b1"
-    Environment = "Dev"
-  }
-}
-#why is this referencing b1? help
-resource "aws_s3_bucket_acl" "example" {
-  bucket = aws_s3_bucket.b1.id
-  acl    = "private"
-}
+# resource "aws_ec2_instance_state" "imported-guy" {
+
+# }
+
+# resource "aws_ec2_instance_state" "dabbycool" {
+
+# }
